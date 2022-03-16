@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Search Web Application</title>
+</head>
+
+<body>
+
+<div class="head">
+    <div class="search"><header><b>FIND YOUR JOB</b></header>  <i class="iconfont icon-sousuo"></i></div>
+    <ul>
+        <li class="tmp">Company</li>
+        <li class="tmp">Job title</li>
+        <li class="tmp"class="tmp">Location</li>
+    </ul>
+    <!-- <div class="history" style="position:fixed;right: 30px;border: 1px solid white"> -->
+    <div class="history" style="position:fixed;right: 30px">
+        <span> <h1> Search Histories</h1> </span>
+        <ul style="display: initial">
+            {% for foo in history_dict %}
+                <li>{{ foo }}</li>
+            {% endfor %}
+            
+
+
+
+        </ul>
+    </div>
+
+    <input id="search" type="text" name="searchSelect" placeholder="Start Here">
+   
+    <div class="send">search</div>
+    
+    {% if flag  %}
+        <div style="width: 1000px;margin: 10px auto;text-align: center">
+        <!-- <div style="text-align: center"></div> -->
+        <table border="1" cellspacing="0">
+            <thead>
+            <tr>
+                <th>job</th>
+                <th>company</th>
+                <th>location</th>
+                <th>description</th>
+                <th>links</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for result in result_list %}
+                <tr>
+                    <th>{{ result.job_title}}</th>
+                    <th>{{ result.company_name }}</th>
+                    <th>{{ result.location }}</th>
+                    <th>{{ result.description }}</th>
+                    <th><a target="_blank" href="{{ result.links }}">detail</a></th>
+
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+</div>
+
+
+
+<!-- <div class="map"> -->
+  
+  <div class="mapButton">Click to view the map</a></div>
+
+  <!-- The div that holds our map -->
+  <div id="mapid"></div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+    integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+    crossorigin=""></script>
+  <!-- D3 JavaScript -->
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+  <!-- API key -->
+  <script type="text/javascript" src="static/js/config.js"></script>
+  <!-- Our JavaScript -->
+  <script type="text/javascript" src="static/js/logic.js"></script>
+<!-- </div> -->
+
+
+<style>
+    .mapButton {
+        width: 50%;
+        height: 50px;
+        margin: 20px auto;
+        text-align: center;
+        line-height: 50px;
+        font: 15px;
+        cursor: pointer;
+        color: rgb(219, 133, 118);
+    }
+    
+    .map {
+        display: none;
+        width: 100%;
+        height: 600px;
+        overflow: hidden;
+    }
+
+  
+    a {
+        color: pink;
+    }
+
+    @import url('//at.alicdn.com/t/font_2590945_j1iz0450h4f.css');
+
+    body {
+        background-color: #34495e;
+        color: white;
+    }
+
+    .search {
+        /* width: 300px; */
+        width: 100%;
+        height: 50px;
+        margin: 200px auto;
+        font-size: 40px;
+        margin-bottom: 50px;
+        text-align: center
+    }
+
+    .search i {
+        font-size: 30px;
+
+    }
+
+
+    ul {
+        display: flex;
+        justify-content: space-around;
+        width: 50%;
+        margin: 0 auto;
+        list-style: none;
+    }
+
+    li {
+        text-align: center;
+        height: 50px;
+        line-height: 50px;
+        font-size: 18px;
+        /* font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif; */
+        font-family: Impact, Haettenschweiler, sans-serif;
+        flex: 1;
+        cursor: pointer;
+        border-radius: 5px;
+
+    }
+
+    input {
+        width: 45%;
+       /* margin: auto 450px; */
+        display: flex;
+        /*vertical-align: middle; */
+        margin: 20PX auto; 
+        height: 40px;
+        border-radius: 10px;
+        font-size: 15px;      
+    }
+
+    .send {
+        width: 80px;
+        height: 50px;
+        margin: 20px auto;
+        line-height: 50px;
+        font-size: 15px;
+        text-align: center;
+        background-color: #bdc3c7;
+        border-radius: 10px;
+        cursor: pointer;
+        animation: pop 1s infinite alternate-reverse;
+    }
+
+    .mapButton .send {
+        display: inline-block;
+        padding-bottom: 20px;
+    }
+    
+
+    @keyframes pop {
+        to {
+            transform: scale(1.2);
+        }
+    }
+
+
+</style>
+
+<script src="/static/js/jquery-3.5.1.js"></script>
+<script>
+    $(function () {
+        var shrinkHeader = 400;
+        $(window).scroll(function () {
+            var scroll = getCurrentScroll();
+            if (scroll >= shrinkHeader) {
+                $('.header').addClass('shrink');
+            } else {
+                $('.header').removeClass('shrink');
+            }
+        });
+
+        function getCurrentScroll() {
+            return window.pageYOffset || document.documentElement.scrollTop;
+        }
+    });
+
+    $('.mapButton').click(function(){
+        location.href = '/map/'
+    })
+
+    let query = 'all'
+    let lis = document.querySelectorAll('li.tmp')
+    lis.forEach(li => {
+
+        li.addEventListener('click', function () {
+            for (let val of lis) {
+                val.style.backgroundColor = '#34495e'
+            }
+            li.style.backgroundColor = '#bdc3c7'
+            query = li.innerHTML
+            console.log(query)
+        })
+    })
+    $('.send').click(function () {
+        var tempwindow = window.open('_blank');
+        tempwindow.location = '/' + '?query=' + query + '&content=' + $('input').val();
+    })
+    $('.history li').click(function (){
+        var text = $(this).text()
+        $('#search').val(text)
+    })
+
+</script>
+
+
+
+<!-- Project Credits -->
+<p style="position: fixed; bottom: 0; width:100%;">
+    <b style="color: rgb(219, 133, 118)">About Us:</b><br/>
+    This web application uses job data derived from Glassdoor. All rights reserved for APAN5400 Job Web Search Development Group.  
+</p>
+
+<h1>Show elapsed time</h1>
+ 
+<hr>
+Elapsed time: {{ g.request_time() }}
+
+
+</body>
+</html>
